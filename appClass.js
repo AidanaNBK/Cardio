@@ -205,4 +205,10 @@ class App {
     this.#workouts = data;
     this.#workouts.forEach(w => this._addToList(w));
   }
+
+  // to reset local storage
+  reset() {
+    localStorage.removeItem('workouts');
+    location.reload();
+  }
 }
