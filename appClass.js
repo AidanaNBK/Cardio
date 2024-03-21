@@ -81,7 +81,49 @@ class App {
       .openPopup();
   }
 
-  _addToList(workout) {}
+  _addToList(workout) {
+    let html = `
+    <li class="workout workout--${workout.type}" data-id="${workout.id}">
+      <h2 class="workout__title">${workout.description}</h2>
+      <div class="workout__details">
+        <span class="workout__icon">${workout.icon}</span>
+        <span class="workout__value">${workout.distance}</span>
+        <span class="workout__unit">km</span>
+      </div>
+      <div class="workout__details">
+        <span class="workout__icon">⏱</span>
+        <span class="workout__value">${workout.duration}</span>
+        <span class="workout__unit">min</span>
+      </div>
+    `;
+    if (workout.type === 'running') {
+      html += `<div class="workout__details">
+                <span class="workout__icon">📏</span>
+                <span class="workout__value">${workout.pace.toFixed(2)}</span>
+                <span class="workout__unit">min/km</span>
+              </div>
+              <div class="workout__details">
+                <span class="workout__icon">👟</span>
+                <span class="workout__value">${workout.temp.toFixed(2)}</span>
+                <span class="workout__unit">steps/min</span>
+              </div>
+            </li>`;
+    } else {
+      html += `<div class="workout__details">
+                <span class="workout__icon">📏</span>
+                <span class="workout__value">${workout.speed.toFixed(2)}</span>
+                <span class="workout__unit">km/hr</span>
+              </div>
+              <div class="workout__details">
+                <span class="workout__icon">🏔</span>
+                <span class="workout__value">${workout.climb.toFixed(2)}</span>
+                <span class="workout__unit">meters</span>
+              </div>
+            </li>`;
+    }
+    console.log(form);
+    form.insertAdjacentHTML('afterend', html);
+  }
 
   _newWorkout(e) {
     const areNumbers = (...numbers) =>
