@@ -1,8 +1,9 @@
 'use strict';
+let id = 0;
 class Workout {
   date = new Date();
   // better to use specific library for the id creation
-  id = (new Date() + '').slice(-10);
+  id = (Number(new Date()) + '').slice(-10);
   constructor(distance, duration, coords) {
     this.distance = distance; //km
     this.duration = duration; //min
@@ -14,7 +15,9 @@ class Workout {
         this.date
       )}`;
     } else {
-      this.description = `Cycling ${this.date}`;
+      this.description = `Cycling ${new Intl.DateTimeFormat('en-En').format(
+        this.date
+      )}`;
     }
   }
 }

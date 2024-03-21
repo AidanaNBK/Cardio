@@ -8,9 +8,11 @@ class App {
   constructor() {
     // at the moment of creation will be called automatically
     this._getPosition();
+    this._getLocalStorageData();
     form.addEventListener('submit', this._newWorkout.bind(this));
     // this event listener should be outside the form event listener
     inputType.addEventListener('change', this._toggleClimbField.bind(this));
+    containerWorkouts.addEventListener('click', this._moveToWorkout.bind(this));
   }
 
   _hideForm() {
@@ -51,6 +53,9 @@ class App {
 
     // event listener for the map click (method in the leaflet library)
     this.#map.on('click', this._showForm.bind(this));
+
+    // due to the fact of async in js, should be done after loading map
+    this.#workouts.forEach(w => this._displayWorkout(w));
   }
 
   _showForm(event) {
@@ -65,7 +70,7 @@ class App {
     inputDistance.focus();
   }
 
-  _displayWorkout(workout, type) {
+  _displayWorkout(workout) {
     // L.marker([lat, lng]).addTo(map).bindPopup('Training').openPopup();
     L.marker(workout.coords)
       .addTo(this.#map)
@@ -73,7 +78,7 @@ class App {
         L.popup({
           maxWidth: 200,
           minWidth: 60,
-          autoClose: false, // !why not working?!?!
+          // autoClose: false,
           className: `${workout.type}-popup`,
         })
       )
@@ -121,7 +126,6 @@ class App {
               </div>
             </li>`;
     }
-    console.log(form);
     form.insertAdjacentHTML('afterend', html);
   }
 
@@ -162,7 +166,6 @@ class App {
 
     // add object to the array of workout
     this.#workouts.push(workout);
-    console.log(this.#workouts);
 
     // show training in the map
     this._displayWorkout(workout);
@@ -172,5 +175,34 @@ class App {
     // add a marker to the map according to the coordinates
 
     this._hideForm();
+
+    this._addToLocal();
+  }
+
+  _moveToWorkout(e) {
+    let elem = e.target.closest('.workout');
+    if (!elem) {
+      return;
+    }
+    // console.log(elem.dataset.id);
+    const workout = this.#workouts.find(
+      workout => workout.id === elem.dataset.id
+    );
+    this.#map.setView(workout.coords, 14, {
+      animate: true,
+      pan: { duration: 1 },
+    });
+  }
+
+  _addToLocal() {
+    // only to small amount of data
+    localStorage.setItem('workouts', JSON.stringify(this.#workouts));
+  }
+
+  _getLocalStorageData() {
+    const data = JSON.parse(localStorage.getItem('workouts'));
+    if (!data) return;
+    this.#workouts = data;
+    this.#workouts.forEach(w => this._addToList(w));
   }
 }
