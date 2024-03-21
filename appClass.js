@@ -8,11 +8,19 @@ class App {
   constructor() {
     // at the moment of creation will be called automatically
     this._getPosition();
-
     form.addEventListener('submit', this._newWorkout.bind(this));
-
     // this event listener should be outside the form event listener
     inputType.addEventListener('change', this._toggleClimbField.bind(this));
+  }
+
+  _hideForm() {
+    // clear the input fields
+    inputDistance.value = '';
+    inputDuration.value = '';
+    inputTemp.value = '';
+    inputClimb.value = '';
+    // hide the form
+    form.classList.add('hidden');
   }
 
   _getPosition() {
@@ -57,30 +65,70 @@ class App {
     inputDistance.focus();
   }
 
-  _newWorkout(e) {
-    e.preventDefault();
-    // clear the input fields
-    inputDistance.value = '';
-    inputDuration.value = '';
-    inputTemp.value = '';
-    inputClimb.value = '';
-
-    // add a marker to the map according to the coordinates
+  _displayWorkout(workout, type) {
     // L.marker([lat, lng]).addTo(map).bindPopup('Training').openPopup();
-    const { lat, lng } = this.#mapEvent.latlng;
-    L.marker([lat, lng])
+    L.marker(workout.coords)
       .addTo(this.#map)
       .bindPopup(
         L.popup({
           maxWidth: 200,
           minWidth: 60,
           autoClose: false, // !why not working?!?!
-          className: 'running-popup',
+          className: `${workout.type}-popup`,
         })
       )
-      .setPopupContent('Training')
+      .setPopupContent(`${workout.type} workout`)
       .openPopup();
+  }
 
-    form.classList.add('hidden');
+  _addToList(workout) {}
+
+  _newWorkout(e) {
+    const areNumbers = (...numbers) =>
+      numbers.every(num => Number.isFinite(num));
+    const arePositive = (...numbers) => numbers.every(num => num > 0);
+
+    e.preventDefault();
+
+    const { lat, lng } = this.#mapEvent.latlng;
+
+    // recieve values from form
+    const type = inputType.value;
+    const distance = +inputDistance.value;
+    const time = +inputDuration.value;
+    let workout;
+    // determine type of the training
+    if (type === 'running') {
+      const temp = +inputTemp.value;
+      if (
+        !areNumbers(temp, distance, time) ||
+        !arePositive(temp, distance, time)
+      ) {
+        alert('Invalid input!');
+        return;
+      }
+      workout = new Running(distance, time, [lat, lng], temp);
+    }
+    if (type === 'cycling') {
+      const climb = +inputClimb.value;
+      if (!areNumbers(climb, distance, time) || !arePositive(distance, time)) {
+        alert('Invalid input!');
+        return;
+      }
+      workout = new Cycling(distance, time, [lat, lng], climb);
+    }
+
+    // add object to the array of workout
+    this.#workouts.push(workout);
+    console.log(this.#workouts);
+
+    // show training in the map
+    this._displayWorkout(workout);
+
+    // show training in the list
+    this._addToList(workout);
+    // add a marker to the map according to the coordinates
+
+    this._hideForm();
   }
 }

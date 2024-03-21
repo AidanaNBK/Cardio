@@ -1,27 +1,35 @@
 'use strict';
-let id = 0;
 class Workout {
+  date = new Date();
+  // better to use specific library for the id creation
+  id = (new Date() + '').slice(-10);
   constructor(distance, duration, coords) {
-    this.id = id++;
-    this.distance = distance;
-    this.duration = duration;
+    this.distance = distance; //km
+    this.duration = duration; //min
     this.coords = coords;
-    this.date = new Date();
   }
 }
 
 class Running extends Workout {
-  constructor(distance, duration, coords, temp, pace) {
+  type = 'running';
+  constructor(distance, duration, coords, temp) {
     super(distance, duration, coords);
     this.temp = temp;
-    this.pace = pace;
+    this.calculatePace();
+  }
+  calculatePace() {
+    this.pace = this.duration / this.distance;
   }
 }
 
 class Cycling extends Workout {
-  constructor(distance, duration, coords, climb, speed) {
+  type = 'cycling';
+  constructor(distance, duration, coords, climb) {
     super(distance, duration, coords);
     this.climb = climb;
-    this.speed = speed;
+    this.calculateSpeed();
+  }
+  calculateSpeed() {
+    this.speed = this.distance / this.duration / 60;
   }
 }
