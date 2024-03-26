@@ -9,6 +9,8 @@ class App {
     // at the moment of creation will be called automatically
     this._getPosition();
     this._getLocalStorageData();
+    // here should be changed for the check of the form (as only one form is using for submit)
+    sort.addEventListener('change', this._sortList.bind(this));
     form.addEventListener('submit', this._newWorkout.bind(this));
     // this event listener should be outside the form event listener
     inputType.addEventListener('change', this._toggleClimbField.bind(this));
@@ -129,13 +131,33 @@ class App {
     form.insertAdjacentHTML('afterend', html);
   }
 
+  _sortList(e) {
+    e.preventDefault();
+    const sortVal = sort.value;
+    function sortBy(s) {
+      return function (a, b) {
+        return b[s] - a[s];
+      };
+    }
+    this.#workouts = this.#workouts.sort(sortBy(sortVal));
+
+    console.log(
+      containerWorkouts
+        .querySelectorAll('.workout')
+        .forEach(elem => elem.remove())
+    );
+    this.#workouts.forEach(workout => this._addToList(workout));
+  }
+
   _newWorkout(e) {
     const areNumbers = (...numbers) =>
       numbers.every(num => Number.isFinite(num));
     const arePositive = (...numbers) => numbers.every(num => num > 0);
 
     e.preventDefault();
-
+    if (!this.#mapEvent) {
+      return;
+    }
     const { lat, lng } = this.#mapEvent.latlng;
 
     // recieve values from form

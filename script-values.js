@@ -10,7 +10,9 @@ Before start of the project:
 
 // here will be values for the selected objects from the document
 const form = document.querySelector('.form');
+const sort = document.querySelector('.sort__input');
 const containerWorkouts = document.querySelector('.workouts');
+const allWorkouts = document.querySelectorAll('.workout');
 const inputType = document.querySelector('.form__input--type');
 const inputDistance = document.querySelector('.form__input--distance');
 const inputDuration = document.querySelector('.form__input--duration');
